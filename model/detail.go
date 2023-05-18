@@ -8,6 +8,7 @@ import (
 
 type Detail struct {
 	gorm.Model
+	ID         uint     `gorm:"primaryKey;autoIncrement" json:"id"`
 	UserID     uint     `gorm:"not null" json:"-"`
 	User       User     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"user"`
 	CategoryID uint     `gorm:"not null" json:"-"`

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -19,14 +20,13 @@ type AuthJSON struct {
 var privateKey = []byte("secret")
 
 func GetUser(c *gin.Context) {
-	id := c.Param("id")
-	user, err := model.GetUserById(id)
-	if err != nil {
+	username := c.MustGet("claims").(jwt.MapClaims)["username"].(string)
+	if _, err := model.GetUserByName(username); err != nil {
 		c.JSON(404, gin.H{"error": "user not found"})
 		return
 	}
-	fmt.Println(user)
-	c.JSON(200, user)
+	c.JSON(200, gin.H{"username": username})
+	return
 }
 
 func Register(c *gin.Context) {
@@ -38,6 +38,7 @@ func Register(c *gin.Context) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		c.JSON(400, gin.H{"error": "unable to create user"})
+		return
 	}
 
 	user := model.User{
@@ -45,12 +46,13 @@ func Register(c *gin.Context) {
 		Password: string(hashedPassword),
 	}
 
-	createdUser, err := user.Save()
-	if err != nil {
+	if err := model.CreateUser(&user); err != nil {
 		c.JSON(400, gin.H{"error": "unable to create user"})
+		return
 	}
-	jwtToken := helper.GenerateJWT(createdUser.Username)
+	jwtToken := helper.GenerateJWT(user.Username)
 	c.JSON(201, gin.H{"jwt": jwtToken})
+	return
 }
 
 func Login(c *gin.Context) {
@@ -74,4 +76,23 @@ func Login(c *gin.Context) {
 
 	jwtToken := helper.GenerateJWT(user.Username)
 	c.JSON(200, gin.H{"jwt": jwtToken})
+	return
+}
+
+func DeleteUser(c *gin.Context) {
+	claims := c.MustGet("claims").(jwt.MapClaims)
+	username := claims["username"].(string)
+
+	user, err := model.GetUserByName(username)
+	if err != nil {
+		c.JSON(404, gin.H{"error": "user not found"})
+		return
+	}
+
+	if err := model.DeleteUser(user.ID); err != nil {
+		c.JSON(400, gin.H{"error": "unable to delete user"})
+		return
+	}
+	c.JSON(200, gin.H{"message": "user deleted"})
+	return
 }

@@ -20,7 +20,8 @@ func Verify() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authorization := c.GetHeader("Authorization")
 		tokenString := strings.Split(authorization, " ")[1]
-		if tokenString == "nil" {
+		fmt.Println(tokenString)
+		if tokenString == "null" {
 			c.JSON(400, gin.H{"error": "invalid token"})
 			c.Abort()
 			return

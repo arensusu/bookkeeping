@@ -8,36 +8,16 @@ import (
 
 type User struct {
 	gorm.Model
-	Username string `gorm:"size:255;not null;unique" json:"username"`
+	Username string `gorm:"size:255;not null" json:"username"`
 	Password string `gorm:"size:255;not null" json:"-"`
 	Admin    bool   `gorm:"default:false" json:"admin"`
 }
 
-func (user *User) Save() (*User, error) {
-	err := database.Database.Create(&user).Error
-	if err != nil {
-		return &User{}, err
+func CreateUser(user *User) error {
+	if err := database.Database.Create(user).Error; err != nil {
+		return err
 	}
-	return user, nil
-}
-
-func GetAllUsers() (*[]User, error) {
-	var users []User
-	err := database.Database.Find(&users).Error
-	if err != nil {
-		return &[]User{}, err
-	}
-	return &users, nil
-}
-
-func GetUserById(id string) (User, error) {
-	var user User
-	err := database.Database.Where("ID=?", id).First(&user).Error
-	if err != nil {
-		return User{}, err
-	} else {
-		return user, nil
-	}
+	return nil
 }
 
 func GetUserByName(username string) (User, error) {
@@ -47,5 +27,23 @@ func GetUserByName(username string) (User, error) {
 		return User{}, err
 	} else {
 		return user, nil
+	}
+}
+
+func DeleteUser(id uint) error {
+	err := database.Database.Delete(&User{}, id).Error
+	if err != nil {
+		return err
+	} else {
+		return nil
+	}
+}
+
+func UpdateUser(id uint, user *User) error {
+	err := database.Database.Save(&user).Error
+	if err != nil {
+		return err
+	} else {
+		return nil
 	}
 }

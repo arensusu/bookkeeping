@@ -34,9 +34,10 @@ func main() {
 	authRoutes := router.Group("auth")
 	authRoutes.POST("/register", controller.Register)
 	authRoutes.POST("/login", controller.Login)
+	authRoutes.GET("/user", middleware.Verify(), controller.GetUser)
+	authRoutes.DELETE("/user", middleware.Verify(), controller.DeleteUser)
 
 	apiRoutes := router.Group("api")
-	apiRoutes.GET("/users/:id", controller.GetUser)
 	apiRoutes.GET("/categories", controller.GetCategories)
 	apiRoutes.POST("/categories", controller.CreateCategory)
 	apiRoutes.GET("/categories/:id", controller.GetCategory)
