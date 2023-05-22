@@ -23,7 +23,10 @@ func GetDetails(c *gin.Context) {
 		return
 	}
 
-	details, err := model.GetAllDetailsOfUser(user.ID)
+	startDate := c.Query("startDate")
+	endDate := c.Query("endDate")
+
+	details, err := model.GetAllDetailsOfUser(user.ID, startDate, endDate)
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(404, gin.H{"error": "not found"})

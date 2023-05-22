@@ -25,10 +25,17 @@ func CreateDetail(detail *Detail) error {
 	return nil
 }
 
-func GetAllDetailsOfUser(userID uint) (*[]Detail, error) {
+func GetAllDetailsOfUser(userID uint, startDate string, endDate string) (*[]Detail, error) {
 	var details []Detail
-	err := database.Database.Preload("User").Preload("Category").Where("user_id=?", userID).Find(&details).Error
-	if err != nil {
+	data := database.Database.Preload("User").Preload("Category").Where("user_id=?", userID)
+	if startDate != "" {
+		data = data.Where("created_at>=?", startDate)
+	}
+	if endDate != "" {
+		data = data.Where("created_at<=?", endDate)
+	}
+
+	if err := data.Find(&details).Error; err != nil {
 		return &[]Detail{}, err
 	}
 	return &details, nil
