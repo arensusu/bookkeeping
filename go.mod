@@ -1,4 +1,4 @@
-module firstapp
+module bookkeeping-backend
 
 go 1.20
 

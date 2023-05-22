@@ -5,10 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
-	"firstapp/controller"
-	"firstapp/database"
-	"firstapp/middleware"
-	"firstapp/model"
+	"bookkeeping-backend/controller"
+	"bookkeeping-backend/database"
+	"bookkeeping-backend/middleware"
+	"bookkeeping-backend/model"
 )
 
 func loadDatabase() {

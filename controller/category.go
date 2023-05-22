@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"firstapp/model"
+	"bookkeeping-backend/model"
 	"fmt"
 
 	"github.com/gin-gonic/gin"

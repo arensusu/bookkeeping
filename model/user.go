@@ -1,7 +1,7 @@
 package model
 
 import (
-	"firstapp/database"
+	"bookkeeping-backend/database"
 
 	"gorm.io/gorm"
 )

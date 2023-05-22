@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"firstapp/helper"
-	"firstapp/model"
+	"bookkeeping-backend/helper"
+	"bookkeeping-backend/model"
 	"fmt"
 
 	"strings"
