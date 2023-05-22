@@ -61,12 +61,12 @@ func CreateDetail(c *gin.Context) {
 		Cost:       detailJSON.Cost,
 		Date:       detailJSON.Date,
 	}
-	createdDetail, err := detail.Save()
+	err = model.CreateDetail(&detail)
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(400, gin.H{"error": "unable to create detail"})
 	} else {
-		c.JSON(201, createdDetail)
+		c.JSON(201, detail)
 	}
 }
 

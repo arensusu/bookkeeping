@@ -40,7 +40,7 @@ func DeleteUser(id uint) error {
 }
 
 func UpdateUser(id uint, user *User) error {
-	err := database.Database.Save(&user).Error
+	err := database.Database.Save(user).Error
 	if err != nil {
 		return err
 	} else {

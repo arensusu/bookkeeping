@@ -58,7 +58,7 @@ func DeleteCategory(id string) error {
 }
 
 func UpdateCategory(id string, category *Category) error {
-	err := database.Database.Save(&category).Error
+	err := database.Database.Save(category).Error
 	if err != nil {
 		return err
 	} else {

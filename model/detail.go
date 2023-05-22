@@ -17,12 +17,12 @@ type Detail struct {
 	Date       string   `gorm:"size:255;not null" json:"date"`
 }
 
-func (detail *Detail) Save() (*Detail, error) {
-	err := database.Database.Create(&detail).Error
+func CreateDetail(detail *Detail) error {
+	err := database.Database.Create(detail).Error
 	if err != nil {
-		return &Detail{}, err
+		return err
 	}
-	return detail, nil
+	return nil
 }
 
 func GetAllDetailsOfUser(userID uint) (*[]Detail, error) {
