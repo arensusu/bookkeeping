@@ -29,10 +29,10 @@ func GetAllDetailsOfUser(userID uint, startDate string, endDate string) (*[]Deta
 	var details []Detail
 	data := database.Database.Preload("User").Preload("Category").Where("user_id=?", userID)
 	if startDate != "" {
-		data = data.Where("created_at>=?", startDate)
+		data = data.Where("date>=?", startDate)
 	}
 	if endDate != "" {
-		data = data.Where("created_at<=?", endDate)
+		data = data.Where("date<=?", endDate)
 	}
 
 	if err := data.Find(&details).Error; err != nil {
