@@ -27,7 +27,7 @@ func main() {
 
 	router := gin.Default()
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:3000"}
+	config.AllowOrigins = []string{"https://localhost:3000", "https://arensusu.github.io"}
 	config.AllowHeaders = []string{"Authorization", "Content-Type"}
 	router.Use(cors.New(config))
 
@@ -52,5 +52,5 @@ func main() {
 	detailRoutes.POST("", controller.CreateDetail)
 	detailRoutes.GET("/:id", controller.GetDetail)
 	detailRoutes.DELETE("/:id", controller.DeleteDetail)
-	router.Run(":8080")
+	router.RunTLS(":8080", "./certs/server.crt", "./certs/server.key")
 }
