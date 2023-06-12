@@ -52,6 +52,6 @@ func main() {
 	detailRoutes.POST("", controller.CreateDetail)
 	detailRoutes.GET("/:id", controller.GetDetail)
 	detailRoutes.DELETE("/:id", controller.DeleteDetail)
-	//router.Run(":80")
-	router.RunTLS(":443", "./certs/server.crt", "./certs/server.key")
+	router.Run(":8080")
+	//router.RunTLS(":8080", "./certs/server.crt", "./certs/server.key")
 }
