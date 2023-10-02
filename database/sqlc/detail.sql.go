@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"time"
 )
 
@@ -18,10 +17,10 @@ RETURNING id, user_id, category_id, cost, date, created_at
 `
 
 type CreateDetailParams struct {
-	UserID     sql.NullInt64 `json:"user_id"`
-	CategoryID sql.NullInt64 `json:"category_id"`
-	Cost       int64         `json:"cost"`
-	Date       time.Time     `json:"date"`
+	UserID     int64     `json:"user_id"`
+	CategoryID int64     `json:"category_id"`
+	Cost       int64     `json:"cost"`
+	Date       time.Time `json:"date"`
 }
 
 func (q *Queries) CreateDetail(ctx context.Context, arg CreateDetailParams) (Detail, error) {
@@ -53,6 +52,26 @@ func (q *Queries) DeleteDetail(ctx context.Context, id int64) error {
 	return err
 }
 
+const getDetailById = `-- name: GetDetailById :one
+SELECT id, user_id, category_id, cost, date, created_at
+FROM details
+WHERE id = $1
+`
+
+func (q *Queries) GetDetailById(ctx context.Context, id int64) (Detail, error) {
+	row := q.db.QueryRowContext(ctx, getDetailById, id)
+	var i Detail
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.CategoryID,
+		&i.Cost,
+		&i.Date,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const listDetailsByUserId = `-- name: ListDetailsByUserId :many
 SELECT id, user_id, category_id, cost, date, created_at
 FROM details
@@ -63,9 +82,9 @@ OFFSET $3
 `
 
 type ListDetailsByUserIdParams struct {
-	UserID sql.NullInt64 `json:"user_id"`
-	Limit  int32         `json:"limit"`
-	Offset int32         `json:"offset"`
+	UserID int64 `json:"user_id"`
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
 }
 
 func (q *Queries) ListDetailsByUserId(ctx context.Context, arg ListDetailsByUserIdParams) ([]Detail, error) {
@@ -96,4 +115,37 @@ func (q *Queries) ListDetailsByUserId(ctx context.Context, arg ListDetailsByUser
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateDetail = `-- name: UpdateDetail :one
+UPDATE details
+SET category_id = $2, cost = $3, date = $4
+WHERE id = $1
+RETURNING id, user_id, category_id, cost, date, created_at
+`
+
+type UpdateDetailParams struct {
+	ID         int64     `json:"id"`
+	CategoryID int64     `json:"category_id"`
+	Cost       int64     `json:"cost"`
+	Date       time.Time `json:"date"`
+}
+
+func (q *Queries) UpdateDetail(ctx context.Context, arg UpdateDetailParams) (Detail, error) {
+	row := q.db.QueryRowContext(ctx, updateDetail,
+		arg.ID,
+		arg.CategoryID,
+		arg.Cost,
+		arg.Date,
+	)
+	var i Detail
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.CategoryID,
+		&i.Cost,
+		&i.Date,
+		&i.CreatedAt,
+	)
+	return i, err
 }

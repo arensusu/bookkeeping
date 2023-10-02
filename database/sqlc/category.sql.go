@@ -81,22 +81,3 @@ func (q *Queries) ListCategorys(ctx context.Context, arg ListCategorysParams) ([
 	}
 	return items, nil
 }
-
-const updateCategory = `-- name: UpdateCategory :one
-UPDATE categorys
-SET name = $2
-WHERE id = $1
-RETURNING id, name, created_at
-`
-
-type UpdateCategoryParams struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
-}
-
-func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) (Category, error) {
-	row := q.db.QueryRowContext(ctx, updateCategory, arg.ID, arg.Name)
-	var i Category
-	err := row.Scan(&i.ID, &i.Name, &i.CreatedAt)
-	return i, err
-}

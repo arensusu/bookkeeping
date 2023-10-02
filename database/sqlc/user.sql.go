@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createUser = `-- name: CreateUser :one
@@ -17,9 +16,9 @@ RETURNING id, username, password, is_admin, created_at
 `
 
 type CreateUserParams struct {
-	Username string       `json:"username"`
-	Password string       `json:"password"`
-	IsAdmin  sql.NullBool `json:"is_admin"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	IsAdmin  bool   `json:"is_admin"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
