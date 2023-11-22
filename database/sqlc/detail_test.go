@@ -10,19 +10,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createRandomDetail(t *testing.T, user User, category Category) Detail {
+func createRandomDetail(t *testing.T, user User, category string) Detail {
 	arg := CreateDetailParams{
-		UserID:     user.ID,
-		CategoryID: category.ID,
-		Cost:       random.Cost(),
-		Date:       random.Date(),
+		Username: user.Username,
+		Category: category,
+		Cost:     random.Cost(),
+		Date:     random.Date(),
 	}
 	detail, err := testQueries.CreateDetail(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, detail)
 
-	require.Equal(t, arg.UserID, detail.UserID)
-	require.Equal(t, arg.CategoryID, detail.CategoryID)
+	require.Equal(t, arg.Username, detail.Username)
+	require.Equal(t, arg.Category, detail.Category)
 	require.Equal(t, arg.Cost, detail.Cost)
 	require.WithinDuration(t, arg.Date, detail.Date, time.Second)
 	require.NotZero(t, detail.ID)
@@ -32,18 +32,18 @@ func createRandomDetail(t *testing.T, user User, category Category) Detail {
 }
 
 func TestCreateDetail(t *testing.T) {
-	createRandomDetail(t, createRandomUser(t), createRandomCategory(t))
+	createRandomDetail(t, createRandomUser(t), random.Category())
 }
 
 func TestGetDetailById(t *testing.T) {
-	detail1 := createRandomDetail(t, createRandomUser(t), createRandomCategory(t))
-	detail2, err := testQueries.GetDetailById(context.Background(), detail1.ID)
+	detail1 := createRandomDetail(t, createRandomUser(t), random.Category())
+	detail2, err := testQueries.GetDetail(context.Background(), detail1.ID)
 	require.NoError(t, err)
 	require.NotEmpty(t, detail2)
 
 	require.Equal(t, detail1.ID, detail2.ID)
-	require.Equal(t, detail1.UserID, detail2.UserID)
-	require.Equal(t, detail1.CategoryID, detail2.CategoryID)
+	require.Equal(t, detail1.Username, detail2.Username)
+	require.Equal(t, detail1.Category, detail2.Category)
 	require.Equal(t, detail1.Cost, detail2.Cost)
 	require.WithinDuration(t, detail1.Date, detail2.Date, time.Second)
 	require.WithinDuration(t, detail1.CreatedAt, detail2.CreatedAt, time.Second)
@@ -52,15 +52,15 @@ func TestGetDetailById(t *testing.T) {
 func TestListDetailsByUserId(t *testing.T) {
 	user := createRandomUser(t)
 	for i := 0; i < 10; i += 1 {
-		createRandomDetail(t, user, createRandomCategory(t))
+		createRandomDetail(t, user, random.Category())
 	}
 
-	arg := ListDetailsByUserIdParams{
-		UserID: user.ID,
-		Offset: 5,
-		Limit:  5,
+	arg := ListDetailsByUserParams{
+		Username: user.Username,
+		Offset:   5,
+		Limit:    5,
 	}
-	details, err := testQueries.ListDetailsByUserId(context.Background(), arg)
+	details, err := testQueries.ListDetailsByUser(context.Background(), arg)
 	require.NoError(t, err)
 	require.Len(t, details, 5)
 
@@ -70,32 +70,32 @@ func TestListDetailsByUserId(t *testing.T) {
 }
 
 func TestUpdateDetail(t *testing.T) {
-	category := createRandomCategory(t)
-	detail1 := createRandomDetail(t, createRandomUser(t), createRandomCategory(t))
+	category := random.Category()
+	detail1 := createRandomDetail(t, createRandomUser(t), random.Category())
 	arg := UpdateDetailParams{
-		ID:         detail1.ID,
-		CategoryID: category.ID,
-		Cost:       random.Cost(),
-		Date:       random.Date(),
+		ID:       detail1.ID,
+		Category: category,
+		Cost:     random.Cost(),
+		Date:     random.Date(),
 	}
 	detail2, err := testQueries.UpdateDetail(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, detail2)
 
 	require.Equal(t, detail1.ID, detail2.ID)
-	require.Equal(t, detail1.UserID, detail2.UserID)
-	require.Equal(t, arg.CategoryID, detail2.CategoryID)
+	require.Equal(t, detail1.Username, detail2.Username)
+	require.Equal(t, arg.Category, detail2.Category)
 	require.Equal(t, arg.Cost, detail2.Cost)
 	require.WithinDuration(t, arg.Date, detail2.Date, time.Second)
 	require.WithinDuration(t, detail1.CreatedAt, detail2.CreatedAt, time.Second)
 }
 
 func DeleteDetail(t *testing.T) {
-	detail1 := createRandomDetail(t, createRandomUser(t), createRandomCategory(t))
+	detail1 := createRandomDetail(t, createRandomUser(t), random.Category())
 	err := testQueries.DeleteDetail(context.Background(), detail1.ID)
 	require.NoError(t, err)
 
-	detail2, err := testQueries.GetDetailById(context.Background(), detail1.ID)
+	detail2, err := testQueries.GetDetail(context.Background(), detail1.ID)
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, detail2)

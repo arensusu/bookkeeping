@@ -9,22 +9,20 @@ import (
 )
 
 type Category struct {
-	ID        int64     `json:"id"`
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
 type Detail struct {
-	ID         int64     `json:"id"`
-	UserID     int64     `json:"user_id"`
-	CategoryID int64     `json:"category_id"`
-	Cost       int64     `json:"cost"`
-	Date       time.Time `json:"date"`
-	CreatedAt  time.Time `json:"created_at"`
+	ID        int64     `json:"id"`
+	Username  string    `json:"username"`
+	Category  string    `json:"category"`
+	Cost      int64     `json:"cost"`
+	Date      time.Time `json:"date"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type User struct {
-	ID        int64     `json:"id"`
 	Username  string    `json:"username"`
 	Password  string    `json:"password"`
 	IsAdmin   bool      `json:"is_admin"`

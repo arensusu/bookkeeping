@@ -11,30 +11,30 @@ import (
 )
 
 const createDetail = `-- name: CreateDetail :one
-INSERT INTO details (user_id, category_id, cost, date)
+INSERT INTO details (username, category, cost, date)
 VALUES ($1, $2, $3, $4)
-RETURNING id, user_id, category_id, cost, date, created_at
+RETURNING id, username, category, cost, date, created_at
 `
 
 type CreateDetailParams struct {
-	UserID     int64     `json:"user_id"`
-	CategoryID int64     `json:"category_id"`
-	Cost       int64     `json:"cost"`
-	Date       time.Time `json:"date"`
+	Username string    `json:"username"`
+	Category string    `json:"category"`
+	Cost     int64     `json:"cost"`
+	Date     time.Time `json:"date"`
 }
 
 func (q *Queries) CreateDetail(ctx context.Context, arg CreateDetailParams) (Detail, error) {
 	row := q.db.QueryRowContext(ctx, createDetail,
-		arg.UserID,
-		arg.CategoryID,
+		arg.Username,
+		arg.Category,
 		arg.Cost,
 		arg.Date,
 	)
 	var i Detail
 	err := row.Scan(
 		&i.ID,
-		&i.UserID,
-		&i.CategoryID,
+		&i.Username,
+		&i.Category,
 		&i.Cost,
 		&i.Date,
 		&i.CreatedAt,
@@ -52,19 +52,19 @@ func (q *Queries) DeleteDetail(ctx context.Context, id int64) error {
 	return err
 }
 
-const getDetailById = `-- name: GetDetailById :one
-SELECT id, user_id, category_id, cost, date, created_at
+const getDetail = `-- name: GetDetail :one
+SELECT id, username, category, cost, date, created_at
 FROM details
 WHERE id = $1
 `
 
-func (q *Queries) GetDetailById(ctx context.Context, id int64) (Detail, error) {
-	row := q.db.QueryRowContext(ctx, getDetailById, id)
+func (q *Queries) GetDetail(ctx context.Context, id int64) (Detail, error) {
+	row := q.db.QueryRowContext(ctx, getDetail, id)
 	var i Detail
 	err := row.Scan(
 		&i.ID,
-		&i.UserID,
-		&i.CategoryID,
+		&i.Username,
+		&i.Category,
 		&i.Cost,
 		&i.Date,
 		&i.CreatedAt,
@@ -72,23 +72,23 @@ func (q *Queries) GetDetailById(ctx context.Context, id int64) (Detail, error) {
 	return i, err
 }
 
-const listDetailsByUserId = `-- name: ListDetailsByUserId :many
-SELECT id, user_id, category_id, cost, date, created_at
+const listDetailsByUser = `-- name: ListDetailsByUser :many
+SELECT id, username, category, cost, date, created_at
 FROM details
-WHERE user_id = $1
+WHERE username = $1
 ORDER BY date ASC
 LIMIT $2
 OFFSET $3
 `
 
-type ListDetailsByUserIdParams struct {
-	UserID int64 `json:"user_id"`
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+type ListDetailsByUserParams struct {
+	Username string `json:"username"`
+	Limit    int32  `json:"limit"`
+	Offset   int32  `json:"offset"`
 }
 
-func (q *Queries) ListDetailsByUserId(ctx context.Context, arg ListDetailsByUserIdParams) ([]Detail, error) {
-	rows, err := q.db.QueryContext(ctx, listDetailsByUserId, arg.UserID, arg.Limit, arg.Offset)
+func (q *Queries) ListDetailsByUser(ctx context.Context, arg ListDetailsByUserParams) ([]Detail, error) {
+	rows, err := q.db.QueryContext(ctx, listDetailsByUser, arg.Username, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -98,8 +98,8 @@ func (q *Queries) ListDetailsByUserId(ctx context.Context, arg ListDetailsByUser
 		var i Detail
 		if err := rows.Scan(
 			&i.ID,
-			&i.UserID,
-			&i.CategoryID,
+			&i.Username,
+			&i.Category,
 			&i.Cost,
 			&i.Date,
 			&i.CreatedAt,
@@ -119,30 +119,30 @@ func (q *Queries) ListDetailsByUserId(ctx context.Context, arg ListDetailsByUser
 
 const updateDetail = `-- name: UpdateDetail :one
 UPDATE details
-SET category_id = $2, cost = $3, date = $4
+SET category = $2, cost = $3, date = $4
 WHERE id = $1
-RETURNING id, user_id, category_id, cost, date, created_at
+RETURNING id, username, category, cost, date, created_at
 `
 
 type UpdateDetailParams struct {
-	ID         int64     `json:"id"`
-	CategoryID int64     `json:"category_id"`
-	Cost       int64     `json:"cost"`
-	Date       time.Time `json:"date"`
+	ID       int64     `json:"id"`
+	Category string    `json:"category"`
+	Cost     int64     `json:"cost"`
+	Date     time.Time `json:"date"`
 }
 
 func (q *Queries) UpdateDetail(ctx context.Context, arg UpdateDetailParams) (Detail, error) {
 	row := q.db.QueryRowContext(ctx, updateDetail,
 		arg.ID,
-		arg.CategoryID,
+		arg.Category,
 		arg.Cost,
 		arg.Date,
 	)
 	var i Detail
 	err := row.Scan(
 		&i.ID,
-		&i.UserID,
-		&i.CategoryID,
+		&i.Username,
+		&i.Category,
 		&i.Cost,
 		&i.Date,
 		&i.CreatedAt,

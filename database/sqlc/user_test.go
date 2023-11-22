@@ -26,7 +26,6 @@ func createRandomUser(t *testing.T) User {
 	require.Equal(t, arg.Password, user.Password)
 	require.Equal(t, arg.IsAdmin, user.IsAdmin)
 
-	require.NotZero(t, user.ID)
 	require.NotZero(t, user.CreatedAt)
 
 	return user
@@ -38,11 +37,10 @@ func TestCreateUser(t *testing.T) {
 
 func TestGetUserById(t *testing.T) {
 	user1 := createRandomUser(t)
-	user2, err := testQueries.GetUserById(context.Background(), user1.ID)
+	user2, err := testQueries.GetUser(context.Background(), user1.Username)
 	require.NoError(t, err)
 	require.NotEmpty(t, user2)
 
-	require.Equal(t, user1.ID, user2.ID)
 	require.Equal(t, user1.Username, user2.Username)
 	require.Equal(t, user1.Password, user2.Password)
 	require.Equal(t, user1.IsAdmin, user2.IsAdmin)
@@ -52,14 +50,13 @@ func TestGetUserById(t *testing.T) {
 func TestUpdateUser(t *testing.T) {
 	user1 := createRandomUser(t)
 	arg := UpdateUserParams{
-		ID:       user1.ID,
+		Username: user1.Username,
 		Password: helper.Encode(random.Password()),
 	}
 	user2, err := testQueries.UpdateUser(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, user2)
 
-	require.Equal(t, user1.ID, user2.ID)
 	require.Equal(t, user1.Username, user2.Username)
 	require.Equal(t, arg.Password, user2.Password)
 	require.Equal(t, user1.IsAdmin, user2.IsAdmin)
@@ -68,10 +65,10 @@ func TestUpdateUser(t *testing.T) {
 
 func TestDeleteUser(t *testing.T) {
 	user1 := createRandomUser(t)
-	err := testQueries.DeleteUser(context.Background(), user1.ID)
+	err := testQueries.DeleteUser(context.Background(), user1.Username)
 	require.NoError(t, err)
 
-	user2, err := testQueries.GetUserById(context.Background(), user1.ID)
+	user2, err := testQueries.GetUser(context.Background(), user1.Username)
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, user2)
